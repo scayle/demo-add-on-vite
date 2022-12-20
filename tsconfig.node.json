@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "composite": true,
+        "module": "ESNext",
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "./src/*"
+            ]
+        },
+        "moduleResolution": "Node",
+        "lib": [
+            "ESNext"
+        ],
+        "allowSyntheticDefaultImports": true
+    },
+    "include": [
+        "vite.config.ts",
+        "vite.add-on.config.ts",
+        "vitest-setup.ts",
+        "vite-plugins/**/*.ts",
+		"src/declarations.d.ts"
+    ]
+}

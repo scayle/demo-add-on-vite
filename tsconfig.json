@@ -1,0 +1,45 @@
+{
+    "compilerOptions": {
+        "target": "es2020",
+        "module": "es2020",
+        "moduleResolution": "node",
+        "jsx": "preserve",
+        "baseUrl": ".",
+        "allowJs": true,
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true,
+        "paths": {
+            "@/*": [
+                "./src/*"
+            ]
+        },
+        "lib": [
+            "ESNext",
+            "DOM"
+        ],
+        "types": [
+            "unplugin-icons/types/vue",
+            "vite/client"
+        ],
+        "noEmit": true,
+        "skipLibCheck": true
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.d.ts",
+        "src/**/*.tsx",
+        "src/**/*.vue"
+    ],
+    "exclude": [
+        "node_modules",
+        "src/**/*.unit.ts"
+    ],
+    "references": [
+        {
+            "path": "./tsconfig.node.json"
+        }
+    ]
+}

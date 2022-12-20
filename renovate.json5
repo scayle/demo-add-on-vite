@@ -1,0 +1,53 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:base"
+    ],
+    "enabledManagers": ["npm"],
+    "rangeStrategy": "bump",
+    "dependencyDashboard": false,
+    "timezone": "Europe/Berlin",
+    "gitLabIgnoreApprovals": true,
+    "patch": {
+        "prPriority": 30
+    },
+    "minor": {
+        "prPriority": 20
+    },
+    "major": {
+        "prPriority": 10
+    },
+    "prConcurrentLimit": 12,
+    "packageRules": [
+        // Minor/patch updates
+        {
+            "matchUpdateTypes": ["minor", "patch"],
+            "labels": ["renovate-minor"],
+            "prHourlyLimit": 1,
+            "schedule": ["every weekend"],
+            "rebaseWhen": "never",
+            "groupName": "all non-major dependencies",
+            "groupSlug": "all-minor-patch"
+        },
+        // Major updates
+        {
+            "matchUpdateTypes": ["major"],
+            "labels": ["renovate-major"],
+            "schedule": null,
+            "rebaseWhen": "never",
+            "prHourlyLimit": 2
+        },
+        // Auto-merge JS deps which won't affect the build (e.g. lint)
+        {
+            "matchPackagePrefixes": ["eslint", "@types"],
+            "matchPackageNames": ["@vue/test-utils", "vitest", "@typescript-eslint/parser"],
+            "automerge": true,
+            "platformAutomerge": true,
+            "labels": ["renovate-auto"],
+            "schedule": null,
+            "reviewers": [],
+            "rebaseWhen": "auto",
+            "prHourlyLimit": 2
+        },
+    ],
+}

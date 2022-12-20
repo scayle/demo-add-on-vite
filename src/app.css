@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.single-spa-container {
+    height: 100%;
+    overflow: hidden;
+}
+
+.ay-input,
+.ay-input .ay-input__inner,
+.ay-input input {
+    width: 100%;
+}
+
+.ay-select,
+.ay-select .ay-popper__reference {
+    width: 100%;
+}
+
+/**
+    Temp fix until we use more than one selector
+    to style dashboard statistics icon
+    as it gets overriden by .icon
+ */
+.ay-dashboard-statistic .ay-dashboard-statistic__icon {
+    display: inline-flex;
+    height: 60px;
+    width: 60px;
+}
