@@ -24,15 +24,15 @@
 
         <label class="label">
           <span class="label-text is-required">Type</span>
-          <select
+
+          <AySelect
             v-model="type"
-            class="form-control"
           >
-            <option value="info">Info</option>
-            <option value="warning">Warning</option>
-            <option value="success">Success</option>
-            <option value="error">Error</option>
-          </select>
+            <AyOption value="info">Info</AyOption>
+            <AyOption value="warning">Warning</AyOption>
+            <AyOption value="success">Success</AyOption>
+            <AyOption value="error">Error</AyOption>
+          </AySelect>
         </label>
       </div>
       <div class="btn-group">

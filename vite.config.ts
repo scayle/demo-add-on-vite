@@ -19,6 +19,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import aboutYouStyleLoader from './vite-plugins/aboutYouStyleLoader';
 import aboutYouAddonLoader from './vite-plugins/aboutYouAddonLoader';
 import aboutYouVueStyleLoader from './vite-plugins/aboutYouVueStyleLoader';
+import aboutYouGlobalWindowEventLoader from './vite-plugins/aboutYouGlobalWindowEventLoader';
 
 const require = createRequire(import.meta.url);
 
@@ -84,9 +85,11 @@ export default defineConfig(({ mode, command }) => {
         }
 
         return [
+            aboutYouGlobalWindowEventLoader({ addOnId: env.PANEL_ADDON_IDENTIFIER }),
             aboutYouVueStyleLoader({
                 command,
                 shadowDomContainerSelector: '.single-spa-container',
+                addOnId: env.PANEL_ADDON_IDENTIFIER,
                 attributes: {
                     'data-add-on': env.PANEL_ADDON_IDENTIFIER,
                 }
@@ -94,6 +97,7 @@ export default defineConfig(({ mode, command }) => {
             aboutYouStyleLoader({
                 external: ['element-plus'],
                 shadowDomContainerSelector: '.single-spa-container',
+                addOnId: env.PANEL_ADDON_IDENTIFIER,
                 attributes: {
                     'data-add-on': env.PANEL_ADDON_IDENTIFIER,
                 },

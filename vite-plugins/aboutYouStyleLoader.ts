@@ -1,6 +1,7 @@
 import path from 'path';
 import { nanoid } from 'nanoid';
 import type { Plugin, ResolvedConfig } from 'vite';
+import { generateWindowKeyFromAddon } from './aboutYouGlobalWindowEventLoader';
 
 const commonjsProxyRE = /\?commonjs-proxy/;
 const SPECIAL_QUERY_RE = /[?&](?:worker|sharedworker|raw|url)\b/
@@ -9,6 +10,7 @@ export type AboutYouStyleLoaderOptions = {
     external?: string[],
     attributes?: Record<string, string>,
     shadowDomContainerSelector?: string;
+    addOnId: string;
 };
 
 export const generateCSSModuleCode = ({
@@ -16,8 +18,10 @@ export const generateCSSModuleCode = ({
         mode,
         command,
         moduleId,
+        addOnId,
         attributes = {},
         shouldExport = true,
+        destroyOnHotReload = false,
         shouldInjectImmediately = false,
         shadowDomContainerSelector = '.single-spa-container',
     }: {
@@ -26,7 +30,9 @@ export const generateCSSModuleCode = ({
         moduleId: string;
         command: 'build' | 'serve'
         shouldExport?: boolean;
+        destroyOnHotReload?: boolean; // destroy previous style tag, when hot reload on module ocurrs
         shouldInjectImmediately?: boolean;
+        addOnId: AboutYouStyleLoaderOptions['addOnId'];
         attributes?: AboutYouStyleLoaderOptions['attributes'];
         shadowDomContainerSelector?: AboutYouStyleLoaderOptions['shadowDomContainerSelector'];
     }
@@ -41,12 +47,20 @@ export const generateCSSModuleCode = ({
     let hmrDocumentCode = '';
 
     if (command === 'serve') {
-        hmrCode = `
-            import.meta.hot.accept((module) => {
-                styleDocument.update(module.default.cssContent);
-                styleDocument.updateId(module.default.id);
-            });
-        `;
+        if (destroyOnHotReload) {
+            hmrCode = `
+                import.meta.hot.accept((module) => {
+                    styleDocument.destroy();
+                });
+            `;
+        } else {
+            hmrCode = `
+                import.meta.hot.accept((module) => {
+                    styleDocument.update(module.default.cssContent);
+                    styleDocument.updateId(module.default.id);
+                });
+            `;
+        }
 
         hmrDocumentCode = `
             id: id,
@@ -58,6 +72,7 @@ export const generateCSSModuleCode = ({
                 const element = parent.querySelector('#' + escapeCSSSelector(oldId));
 
                 if (!element) {
+                    console.log('[ADDON_VITE_HMR] Element not found with id: ' + oldId);
                     return;
                 }
 
@@ -71,6 +86,17 @@ export const generateCSSModuleCode = ({
     if (mode === 'development') {
         const fileName = path.basename(moduleId);
         styleId += '-' + fileName;
+    }
+
+    let injectCode = '';
+
+    if (shouldInjectImmediately) {
+        const windowKey = generateWindowKeyFromAddon(addOnId);
+        injectCode += `
+            styleDocument.use();
+
+            window['${windowKey}']?.listen(() => styleDocument.use());
+        `;
     }
 
     return `
@@ -133,6 +159,16 @@ export const generateCSSModuleCode = ({
 
                     element.sheet.disabled = true;
                 },
+                destroy() {
+                    const parent = getParent();
+                    const element = parent.querySelector('#' + escapeCSSSelector(id));
+
+                    if (!element || !element?.sheet) {
+                        return;
+                    }
+
+                    element.parentElement.removeChild(element);
+                },
                 update(newCssContent) {
                     const parent = getParent();
                     let element = parent.querySelector('#' + escapeCSSSelector(id));
@@ -152,8 +188,7 @@ export const generateCSSModuleCode = ({
 
         ${hmrCode}
 
-        // inject style directly if it is an external package's css we are working with
-        ${shouldInjectImmediately ? 'styleDocument.use()' : ''}
+        ${injectCode}
 
         ${shouldExport ? 'export default styleDocument;' : ''}
     `;
@@ -162,6 +197,7 @@ export const generateCSSModuleCode = ({
 // There are not vite plugins that support features similar to webpack's `style-loader`
 // @link: https://github.com/vitejs/vite/issues/4222
 export default function aboutYouStyleLoader({
+    addOnId,
     external = [],
     attributes = {},
     shadowDomContainerSelector = '.single-spa-container',
@@ -240,6 +276,7 @@ export default function aboutYouStyleLoader({
             return {
                 code: generateCSSModuleCode({
                     attributes,
+                    addOnId,
                     moduleId: id,
                     css: cssContents,
                     mode: resolvedConfig.mode,

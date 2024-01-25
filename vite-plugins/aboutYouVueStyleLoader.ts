@@ -1,6 +1,7 @@
 /**
  * External dependencies.
  */
+import path from 'path';
 import { transform } from 'esbuild';
 import MagicString from 'magic-string';
 import type { Plugin, ResolvedConfig } from 'vite';
@@ -29,6 +30,7 @@ const minifyCSS = async (code: string) => {
 // Since we are using shadow dom features
 //
 export default function aboutYouVueStyleLoader({
+    addOnId,
     attributes = {},
     command = 'build',
     shadowDomContainerSelector = '.single-spa-container',
@@ -58,13 +60,15 @@ export default function aboutYouVueStyleLoader({
             cssContents = cssContents.replace('export default ', '');
             cssContents = JSON.parse(cssContents);
             cssContents = generateCSSModuleCode({
+                addOnId,
                 attributes,
-                moduleId: '',
+                moduleId: path.basename(id).split('?')[0],
                 css: cssContents,
                 mode: resolvedConfig.mode,
                 shadowDomContainerSelector,
                 command: resolvedConfig.command,
                 shouldInjectImmediately: true,
+                destroyOnHotReload: true,
             });
 
             return { code: cssContents };
@@ -96,6 +100,7 @@ export default function aboutYouVueStyleLoader({
             const cssString = JSON.stringify(chunkCSS)
             // might have to support assert urls
             const injectCode = generateCSSModuleCode({
+                addOnId,
                 attributes,
                 moduleId: '',
                 css: cssString,

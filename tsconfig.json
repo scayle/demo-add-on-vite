@@ -5,11 +5,13 @@
         "moduleResolution": "node",
         "jsx": "preserve",
         "baseUrl": ".",
+        "strict": true,
         "allowJs": true,
         "sourceMap": true,
         "noImplicitAny": true,
         "noImplicitThis": true,
         "resolveJsonModule": true,
+        "isolatedModules": true,
         "allowSyntheticDefaultImports": true,
         "paths": {
             "@/*": [

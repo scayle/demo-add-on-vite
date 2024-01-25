@@ -28,3 +28,7 @@
     height: 60px;
     width: 60px;
 }
+
+.single-spa-container {
+    --el-color-primary: #0dcc8d !important;
+}

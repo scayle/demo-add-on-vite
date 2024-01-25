@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { it, describe, expect } from 'vitest';
 
 /**
@@ -11,8 +11,8 @@ import ProductsListing from './ProductsListing.vue';
 
 describe('ProductsListing.vue', () => {
     it('can be render', () => {
-        const wrapper = shallowMount(ProductsListing);
+        const wrapper = mount(ProductsListing);
 
-        expect(wrapper.find('.products-listing').exists()).toBeTruthy();
+        expect(wrapper.find('.spinner').exists()).toBeTruthy();
     });
 });

@@ -3,7 +3,7 @@
     <ImagePlaceholderWrapper
       alt=""
       class="data-table-image flex"
-      :image-url="imageSrc"
+      :image-url="imageSrc as string"
     />
   </div>
 </template>

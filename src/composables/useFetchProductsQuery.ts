@@ -8,10 +8,13 @@ import { useQuery } from '@tanstack/vue-query';
  * Internal dependencies.
  */
 import { startTimeout, wrapInRef } from '@/utils';
-import { ProductsData } from '@/types/ProductsData';
+import { Product, ProductStatus } from '@/types/Product';
+import products from '@/mocks/products';
 
 export type ProductsFilters = {
+    search?: string,
     name?: string;
+    status?: ProductStatus[];
 };
 
 export type ProductsPaginationData = {
@@ -19,7 +22,7 @@ export type ProductsPaginationData = {
     lastPage: number;
     currentPage: number;
     hasNextPage: boolean;
-    products: ProductsData[];
+    products: Product[];
 };
 
 export type UseFetchProductsQueryOptions = {
@@ -28,47 +31,68 @@ export type UseFetchProductsQueryOptions = {
     filters?: Ref<ProductsFilters>;
 };
 
+const applyFilters = (filters: ProductsFilters, data: Product[]) => {
+    let localProducts = data;
+
+    if (filters?.name) {
+        localProducts = localProducts.filter(product => product.name.includes(filters.name as string));
+    }
+
+    if (filters?.search) {
+        const search = filters.search;
+        localProducts = localProducts.filter(
+            product => product.name.includes(search) ||
+                product.id?.toString() == search ||
+                product.product_id?.toString() == search ||
+                product.merchant?.includes(search)
+        )
+    }
+
+    if (filters?.status?.length) {
+        localProducts = localProducts.filter((product) => filters?.status?.includes(product.status));
+    }
+
+    return localProducts;
+}
+
 export default function useFetchProductsQuery({ perPage, page, filters }: UseFetchProductsQueryOptions = {}) {
-    page = wrapInRef(page, 1);
-    perPage = wrapInRef(perPage, 15);
-    filters = wrapInRef<ProductsFilters>(filters, {});
+    const localPage = wrapInRef(page, 1);
+    const localPerPage = wrapInRef(perPage, 15);
+    const localFilters = wrapInRef<ProductsFilters>(filters, {});
 
     const {
         isLoading,
         isFetching,
         data
-    } = useQuery<ProductsPaginationData>(['products', filters, page, perPage], async () => {
+    } = useQuery<ProductsPaginationData>(['products', localFilters, localPage, localPerPage], async () => {
         await startTimeout(1000);
 
-        let products = (await import('@/mocks/products.json')).default.data;
+        let localProducts = [...products()];
 
-        if (filters?.value?.name) {
-            products = products.filter(product => product.name.includes(filters?.value?.name));
+        if (localFilters?.value) {
+            localProducts = applyFilters(localFilters.value, localProducts);
         }
 
-        const total = products.length;
+        const total = localProducts.length;
+        const skipPagination = total <= localPerPage.value;
+        const shouldHavePagination = !skipPagination;
+        let hasNextPage = false;
 
-        if (total <= perPage.value) {
-            return {
-                total,
-                products,
-                hasNextPage: false,
-                lastPage: page.value,
-                currentPage: page.value,
-            };
+        if (shouldHavePagination) {
+            const start = (localPage.value - 1) * localPerPage.value
+            const end = localPage.value * localPerPage.value;
+
+            localProducts = localProducts.slice(start, end);
+
+            hasNextPage = end < total;
         }
-
-        const start = (page.value - 1) * perPage.value
-        const end = (page.value * perPage.value) + 1;
-
-        products = products.slice(start, end);
 
         return {
             total,
-            products,
-            hasNextPage: end < total,
-            lastPage: page.value,
-            currentPage: page.value,
+            hasNextPage,
+            products: localProducts,
+            lastPage: localPage.value,
+            currentPage: localPage.value,
         };
     }, { keepPreviousData: true });
 

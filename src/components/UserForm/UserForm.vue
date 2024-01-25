@@ -54,8 +54,7 @@
       <InputLabel label="Status">
         <AySelect
           model-value="active"
-          :get-label="(value: any) => statuses.find(option => option.value === value).name"
-          :append-dropdown-to-body="false"
+          :get-label="(value: any) => statuses?.find(option => option.value === value)?.name"
         >
           <AyOption
             v-for="status in statuses"
@@ -69,8 +68,7 @@
       <InputLabel label="Roles">
         <AySelect
           model-value="developer"
-          :get-label="(value: any) => roles.find(option => option.value === value).name"
-          :append-dropdown-to-body="false"
+          :get-label="(value: any) => roles?.find(option => option.value === value)?.name"
         >
           <AyOption
             v-for="role in roles"
@@ -83,7 +81,6 @@
 
       <InputLabel label="Language">
         <AyCountrySelect
-          :append-dropdown-to-body="false"
           :countries="['DE', 'US', 'GB']"
         />
       </InputLabel>
@@ -107,7 +104,7 @@
             <template #append>
               <ElTooltip
                 v-if="mobileNumberContainer"
-                :append-to="mobileNumberContainer.$el"
+                :append-to="(mobileNumberContainer as any).$el"
                 content="The phone number must be 10 or 11 digits long, and may only include numbers."
               >
                 <IconQuestionFill />

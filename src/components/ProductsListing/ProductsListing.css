@@ -1,0 +1,52 @@
+.products-listing {
+    @apply flex flex-col w-full bg-white border relative overflow-hidden;
+    border-radius: 5px;
+}
+
+.products-listing :deep(.products-listing__head) {
+    @apply grid grid-cols-1 gap-2;
+
+    padding: 15px 20px 15px 20px;
+}
+
+.products-listing :deep(.products-listing__head-inner) {
+    @apply w-full flex justify-between items-center;
+}
+
+
+.products-listing :deep(.products-listing__meta) {
+    @apply text-dark-grey py-2 -mb-4;
+
+    border-top: 1px solid #e9eaec;
+}
+
+.products-listing :deep(.products-listing__filter) {
+    @apply p-1 mr-2 bg-dark font-base outline-0 rounded;
+    @apply inline-flex items-center;
+
+    font-size: 13px;
+}
+
+.products-listing :deep(.products-listing__filter .icon) {
+    @apply cursor-pointer;
+}
+
+:deep(.products-listing__head .ay-search .ay-search__input) {
+    @apply accent-secondary h-[30px] rounded-full;
+}
+
+.products-listing :deep(.products-listing__body) {
+    @apply flex flex-col justify-center overflow-hidden;
+}
+
+.products-listing__footer :deep(.ay-pagination-layout) {
+    border: 0;
+}
+
+.products-listing__footer :deep(.ay-pagination-layout .ay-pagination-layout__group .ay-select) {
+    @apply min-w-[130px] w-[130px];
+}
+
+.products-listing__footer :deep(.ay-pagination-layout .ay-pagination-layout__group .ay-select__input) {
+    @apply min-w-[130px] w-[130px];
+}

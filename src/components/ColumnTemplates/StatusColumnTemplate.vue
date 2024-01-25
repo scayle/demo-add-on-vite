@@ -12,6 +12,7 @@
  * External dependencies.
  */
 import { computed, defineComponent, toRefs } from 'vue';
+import { firstLetterToUpper } from '@/utils';
 
 /**
  * Internal dependencies.
@@ -29,7 +30,7 @@ export default defineComponent({
 
     setup(props) {
         const { payload } = toRefs(props);
-        const statusLabel = computed(() => payload.value.slice(0, 1).toUpperCase() + payload.value.slice(1));
+        const statusLabel = computed(() => firstLetterToUpper(payload.value));
         const bulletClass = computed(() => {
             let status = '';
 

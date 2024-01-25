@@ -1,0 +1,39 @@
+.el-table :deep(.el-table__cell) {
+    @apply text-black;
+    font-size: 13px;
+    padding: 12px 10px;
+    border-top: none;
+    border-bottom: none;
+    vertical-align: middle;
+}
+
+.el-table :deep(.el-scrollbar) {
+    @apply overflow-auto;
+}
+
+.el-table :deep(.table-column-names-row th) {
+    @apply bg-light text-black;
+
+    border-top: 1px solid #e9eaec;
+    border-bottom: none;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 5px 10px;
+}
+
+.el-table :deep(.table-column-names-row .cell) {
+    @apply inline-flex;
+    line-height: 1;
+}
+
+.el-table :deep(.table-column-names-row .cell .column-name-wrapper) {
+    padding: 0;
+    line-height: 1.5;
+    width: 100%;
+}
+
+.el-table :deep(.table-column-names-row .cell .column-name-wrapper .column-name) {
+    vertical-align: middle;
+    padding: 0;
+    line-height: 1.5;
+}

@@ -15,7 +15,7 @@ import { defineComponent, PropType } from 'vue';
 /**
  * Internal dependencies.
  */
-import { ProductsData } from '@/types/ProductsData';
+import { Product } from '@/types/Product';
 
 export default defineComponent({
     name: 'ProductStockColumnTemplate',
@@ -29,7 +29,7 @@ export default defineComponent({
         },
 
         payload: {
-            type: Object as PropType<ProductsData['stock']>,
+            type: Object as PropType<Product['stock']>,
             required: true,
         },
 

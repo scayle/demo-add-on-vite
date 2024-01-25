@@ -1,76 +1,41 @@
 <template>
+  <AySpinner v-if="isLoading " />
+
   <div
+    v-else
     class="products-listing"
-    :class="{ 'pb-4': isLoading }"
   >
-    <div class="products-listing__head mb-4 flex items-center">
-      <strong class="font-bold">Products</strong>
+    <LoadingOverlay v-if="isFetching || isDeleting" />
 
-      <button
-        type="button"
-        data-filter-count="0"
-        class="mis-4 btn btn-icon-only"
-        @click="showFiltersModal = true"
-      >
-        <IconFilter />
-      </button>
-    </div>
+    <ProductsListingHeader
+      :delete-disabled="isDeleteDisabled"
+      :filters="filters"
+      @delete="deleteModalVisible = true"
+      @filters-updated="onFilterUpdate"
+    />
 
-    <div class="products-listing__body">
-      <AySpinner v-if="isLoading" />
-
-      <ElTable
-        v-else
-        stripe
-        header-row-class-name="table-column-names-row"
-        :data="products"
-        max-height="initial"
-      >
-        <ElTableColumn
-          v-for="(column, index) in columns"
-          :key="1 + '-' + JSON.stringify(column) + '-' + index"
-          :width="column.hasOwnProperty('width') ? column.width : ''"
-          :min-width="100"
-          :prop="column.prop"
-          :label="column.label"
-          :row-index="1 + '-' + index"
-        >
-          <template #default="scope">
-            <component
-              :is="column.template"
-              :column="column"
-              :row-index="1 + '-' + index"
-              :full-payload="scope.row"
-              :payload="scope.row[column.prop]"
-            />
-          </template>
-        </ElTableColumn>
-      </ElTable>
-    </div>
+    <ProductsListingBody
+      :columns="columns"
+      :products="products"
+      @selected="onSelected"
+    />
 
     <div class="products-listing__footer">
       <AyPaginationLayout
         v-if="!isLoading"
         v-model:currentPage="page"
-        without-page-size-selector
-        :page-size="30"
-        :total="pagination.total"
-      >
-        <template #after-info>
-          <div class="inline-flex justify-self-center">
-            <AySpinner
-              v-if="isFetching"
-              size="md"
-            />
-          </div>
-        </template>
-      </AyPaginationLayout>
+        v-model:pageSize="perPage"
+        :total="pagination?.total || 0"
+      />
     </div>
 
-
-    <ProductsListingFiltersModal
-      v-model:visible="showFiltersModal"
-      @filters-updated="onFilterUpdate"
+    <AyDangerousActionModal
+      hide-item-name
+      title="Delete product"
+      deleted-item-name="CONFIRM"
+      :visible="deleteModalVisible"
+      @submit="onDeleteProducts"
+      @cancel="deleteModalVisible = false"
     />
   </div>
 </template>
@@ -79,24 +44,32 @@
 /**
  * External dependencies.
  */
-import { computed, defineComponent, ref } from 'vue';
+import type { Ref } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 
 /**
  * Internal dependencies.
  */
-import useFetchProductsQuery, { ProductsFilters } from '@/composables/useFetchProductsQuery';
+import { Product } from '@/types/Product';
+import useProductListingFilters from '@/composables/useProductListingFilters';
+import useDeleteProductsMutation from '@/composables/useDeleteProductsMutation';
 import ImageColumnTemplate from '@/components/ColumnTemplates/ImageColumnTemplate.vue';
 import StringColumnTemplate from '@/components/ColumnTemplates/StringColumnTemplate.vue';
 import StatusColumnTemplate from '@/components/ColumnTemplates/StatusColumnTemplate.vue';
+import useFetchProductsQuery, { ProductsFilters } from '@/composables/useFetchProductsQuery';
 import ProductStockColumnTemplate from '@/components/ColumnTemplates/ProductStockColumnTemplate.vue';
-import ProductsListingFiltersModal from '@/components/ProductsListing/ProductsListingFiltersModal.vue';
+import LoadingOverlay from '@/components/LoadingOverlay/LoadingOverlay.vue';
+import ProductsListingHeader from '@/components/ProductsListing/ProductsListingHeader/ProductsListingHeader.vue';
+import ProductsListingBody from '@/components/ProductsListing/PrdocutsListingBody/ProductsListingBody.vue';
+import ProductActionsColumnTemplate from '@/components/ColumnTemplates/ProductActionsColumnTemplate.vue';
 
 export default defineComponent({
     name: 'ProductsListing',
 
     components: {
-        ProductsListingFiltersModal,
-        StringColumnTemplate
+        ProductsListingBody,
+        ProductsListingHeader,
+        LoadingOverlay,
     },
 
     setup() {
@@ -147,21 +120,49 @@ export default defineComponent({
                 template: ProductStockColumnTemplate,
                 isSortable: false,
             },
+            {
+                prop: 'actions',
+                label: 'Actions',
+                visible: true,
+                template: ProductActionsColumnTemplate,
+                isSortable: false,
+            },
         ];
-        const page = ref(1);
-        const perPage = ref(30);
-        const filters = ref<ProductsFilters>({});
-        const showFiltersModal = ref(false);
+        const deleteModalVisible = ref(false);
+        const { page, perPage, filters, } = useProductListingFilters();
+        const selectedProducts: Ref<Product[]> = ref([]);
         const {
             isLoading,
             isFetching,
             pagination,
         } = useFetchProductsQuery({ page, perPage, filters });
+        const {
+            isDeleting,
+            deleteProducts,
+        } = useDeleteProductsMutation();
+        const isDeleteDisabled = computed(() => isDeleting.value || !selectedProducts.value.length);
         const onFilterUpdate = (newFilters: ProductsFilters) => {
             // reset page
             page.value = 1;
             filters.value = newFilters;
         }
+        const onSelected = (selection: Array<any>) => {
+            selectedProducts.value = [...selection];
+        }
+        const onDeleteProducts = async () => {
+            deleteModalVisible.value = false;
+
+            if (isDeleteDisabled.value) {
+                return;
+            }
+
+            await deleteProducts(selectedProducts.value.map(product => product.id));
+            selectedProducts.value = [];
+        }
+
+        watch(pagination, () => {
+            selectedProducts.value = [];
+        });
 
         return {
             page,
@@ -171,77 +172,17 @@ export default defineComponent({
             isLoading,
             isFetching,
             pagination,
-            showFiltersModal,
+            onSelected,
             onFilterUpdate,
-            products: computed(() => pagination.value.products || []),
+            selectedProducts,
+            isDeleting,
+            onDeleteProducts,
+            isDeleteDisabled,
+            deleteModalVisible,
+            products: computed(() => pagination.value?.products || []),
         }
     }
 });
 </script>
 
-<style scoped>
-.el-table :deep(.el-table__cell) {
-    @apply text-black;
-    font-size: 13px;
-    padding: 12px 10px;
-    border-top: none;
-    border-bottom: none;
-    vertical-align: middle;
-}
-
-.el-table :deep(.el-scrollbar) {
-    @apply overflow-auto;
-}
-
-.el-table :deep(.table-column-names-row th) {
-    @apply bg-light text-black;
-
-    border-top: 1px solid #e9eaec;
-    border-bottom: none;
-    font-size: 13px;
-    font-weight: bold;
-    vertical-align: bottom;
-    padding: 5px 10px;
-}
-
-.el-table :deep(.table-column-names-row .cell) {
-    line-height: 1;
-    display: flex;
-}
-
-.el-table :deep(.table-column-names-row .cell .column-name-wrapper) {
-    padding: 0;
-    line-height: 1.5;
-    width: 100%;
-}
-
-.el-table :deep(.table-column-names-row .cell .column-name-wrapper .column-name) {
-    vertical-align: middle;
-    padding: 0;
-    line-height: 1.5;
-}
-
-.products-listing {
-    @apply flex flex-col w-full bg-white border relative overflow-hidden;
-    border-radius: 5px;
-}
-
-.products-listing .products-listing__head {
-    padding: 15px 20px 0 20px;
-}
-
-.products-listing .products-listing__body {
-    @apply flex flex-col justify-center overflow-hidden;
-}
-
-.products-listing .products-listing__meta {
-    @apply text-dark-grey;
-
-    font-size: 15px;
-    margin-inline-start: 8px;
-}
-
-.products-listing__footer :deep(.ay-pagination-layout) {
-    border: 0;
-}
-</style>
+<style src="./ProductsListing.css" scoped />

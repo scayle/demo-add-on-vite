@@ -1,13 +1,15 @@
 {
     "name": "demo-add-on-vite",
+    "description": "The SCAYLE Panel Demo Add-On is showcasing how to write an Add-On in combination with the SCAYLE Component Library.",
+    "homepage": "https://www.scayle.com/",
     "private": true,
-    "version": "0.0.0",
+    "version": "1.0.0",
     "type": "module",
     "scripts": {
         "dev": "vite",
         "unit": "vitest run",
         "coverage": "vitest run --coverage",
-        "typecheck": "vue-tsc",
+        "typecheck": "vue-tsc --noEmit",
         "preview": "vite preview",
         "build": "vue-tsc --noEmit && vite build",
         "build:watch": "vite build --watch --mode development",
@@ -17,23 +19,33 @@
         "code-lint": "eslint --fix 'src/**/*.{ts,tsx,vue,js}'",
         "lint-staged": "lint-staged"
     },
-    "author": "ABOUT YOU",
-    "license": "proprietary",
+    "keywords": [
+        "scayle",
+        "scayle panel",
+        "panel",
+        "scayle panel components",
+        "panel components",
+        "scayle panel add-on",
+        "panel-add-on",
+        "add-on"
+    ],
+    "author": "SCAYLE",
+    "license": "MIT",
     "dependencies": {
         "@scayle/add-on-utils": "^2.0.0",
-        "@scayle/components": "^1.0.2",
-        "@scayle/panel-icons": "^1.0.0",
+        "@scayle/components": "^1.6.0",
+        "@scayle/panel-icons": "^1.2.0",
         "@scayle/single-spa-vue": "^2.6.2",
-        "@scayle/tailwind-base": "^1.0.2",
+        "@scayle/tailwind-base": "^1.1.1",
         "@tanstack/vue-query": "^4.14.3",
         "@vueuse/core": "^9.4.0",
-        "element-plus": "^2.2.20",
+        "element-plus": "^2.3.4",
         "vue": "^3.2.41",
         "vue-router": "^4.1.6"
     },
     "devDependencies": {
         "@types/node": "^18.11.9",
-        "@typescript-eslint/parser": "^5.42.0",
+        "@typescript-eslint/parser": "^6.0.0",
         "@vitejs/plugin-vue": "^3.2.0",
         "@vitest/coverage-c8": "^0.24.5",
         "@vue/test-utils": "^2.2.1",
@@ -42,7 +54,7 @@
         "eslint": "^8.27.0",
         "eslint-import-resolver-typescript": "^3.5.2",
         "eslint-plugin-import": "^2.26.0",
-        "eslint-plugin-unicorn": "^45.0.0",
+        "eslint-plugin-unicorn": "^48.0.0",
         "eslint-plugin-vue": "^9.7.0",
         "husky": "^8.0.1",
         "jsdom": "^20.0.2",
@@ -58,7 +70,7 @@
         "typescript": "^4.8.4",
         "unplugin-auto-import": "^0.11.4",
         "unplugin-icons": "0.14.13",
-        "unplugin-vue-components": "^0.22.9",
+        "unplugin-vue-components": "^0.24.1",
         "vite": "^3.2.2",
         "vite-tsconfig-paths": "^3.5.2",
         "vitest": "^0.24.5",
@@ -66,6 +78,6 @@
     },
     "volta": {
         "node": "18.12.1",
-        "npm": "8.19.3"
+        "npm": "9.1.1"
     }
 }
