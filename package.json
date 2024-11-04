@@ -15,7 +15,7 @@
         "build:watch": "vite build --watch --mode development",
         "watch": "run-p build:watch preview",
         "generate:ssl": "bash -c ./server-ssl/generate-ssl.sh",
-        "prepare": "bash -c ./scripts/prepare.sh && husky install",
+        "prepare": "bash -c ./scripts/prepare.sh",
         "code-lint": "eslint --fix 'src/**/*.{ts,tsx,vue,js}'",
         "lint-staged": "lint-staged"
     },
