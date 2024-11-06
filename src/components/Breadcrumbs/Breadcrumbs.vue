@@ -36,7 +36,7 @@
           </span>
 
 
-          <IconArrowRight
+          <IconChevronRight
             v-if="index !== breadcrumbs.length - 1"
             class="icon icon-sm mx-1 text-dark-grey"
           />

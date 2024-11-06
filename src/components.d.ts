@@ -30,6 +30,7 @@ declare module '@vue/runtime-core' {
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     IconArrowRight: typeof import('~icons/panel/arrow-right')['default']
+    IconChevronRight: typeof import('~icons/panel/chevron-right')['default']
     IconClose: typeof import('~icons/panel/close')['default']
     IconFilter: typeof import('~icons/panel/filter')['default']
     IconImageSingle: typeof import('~icons/panel/image-single')['default']
