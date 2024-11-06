@@ -24,11 +24,11 @@ import aboutYouGlobalWindowEventLoader from './vite-plugins/aboutYouGlobalWindow
 const require = createRequire(import.meta.url);
 
 function generatePanelIcons() {
-    const dir = path.join(path.dirname(require.resolve('@scayle/panel-icons')), 'img');
+    const dir = path.join(path.dirname(require.resolve('@scayle/panel-icons')), 'icons');
     let icons: Record<string, string> = {};
 
     fs.readdirSync(dir).forEach(function (file: string) {
-        const simpleName = file.replace('.svg', '').replace('ic-', '');
+        const simpleName = file.replace('.svg', '');
         icons[simpleName] = fs.readFileSync(path.join(dir, file)).toString('utf8');
     });
 
