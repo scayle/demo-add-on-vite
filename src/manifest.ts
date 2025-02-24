@@ -1,7 +1,7 @@
 // This config function does nothing but return its input
 // But it does provide some helpful type hints
 import { config, RouteDefinition } from '@scayle/add-on-utils';
-import { AddOnRoute, routes } from './router';
+import { AddOnRoute, routes } from './routes';
 import { GroupRouteDefinition } from './types';
 import { ADD_ON_ID, generateGroupName } from './utils';
 
